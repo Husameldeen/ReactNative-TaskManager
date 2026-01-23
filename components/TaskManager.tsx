@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React,{ useState } from "react";
 import {
-    KeyboardAvoidingView,
-    Platform,
+    View,
     Text,
     TextInput,
     TouchableOpacity,
-    View
+    FlatList,
+    KeyboardAvoidingView,
+    Platform,
+    Modal,
 } from 'react-native';
+import { Calendar } from 'react-native-calendars';
 
 type TaskStatus = 'Not started' | 'In progress' | 'Completed';
 type Task = {
@@ -133,6 +136,23 @@ export default function TaskManager() {
                 <TouchableOpacity style={styles.saveButto} onPress={handleSave}>
                     <Text style={styles.saveButtonText}>{editId? 'Update Task' : 'Add Task'}</Text>
                 </TouchableOpacity>
+                <FlatList 
+                    data={tasks}
+                    keyExtractor={item => item.id}
+                    numColumns={3}
+                    contentContainerStyle={styles.list}
+                    renderItem={({ item }) => (
+                        <View style={styles..card}>
+                            <Text style={styles.cardTitle}>{item.title}</Text>
+                            <Text style={styles.cardDescription}>{item.description}</Text>
+                            <Text style={styles.cardStatus}>{item.status}</Text>
+                            <Text style={styles.cardDueDate}>
+                                Due: {item.dueDate? item.dueDate : 'No deadline'}
+                            </Text>
+
+                        </View>
+                    )}
+                />
             </KeyboardAvoidingView>
         </>
     )
