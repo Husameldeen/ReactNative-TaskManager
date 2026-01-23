@@ -4,6 +4,7 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
+    StyleSheet,
     FlatList,
     KeyboardAvoidingView,
     Platform,
@@ -149,11 +150,193 @@ export default function TaskManager() {
                             <Text style={styles.cardDueDate}>
                                 Due: {item.dueDate? item.dueDate : 'No deadline'}
                             </Text>
-
+                            <View style={styles.cardButton}>
+                                <TouchableOpacity onPress={() => handleEdit(item)}>
+                                    <Text style={styles.edit}>Edit</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => handleDelete(item.id)}>
+                                    <Text style={styles.delete}>Delete</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     )}
                 />
+                {showAnalytics && total > 0 && (
+                    <View style={styles.analytics}>
+                        <Text style={styles.analyticsTitle}>Analytics</Text>
+                        <Text style={styles.analyticsText}>{completedPercentage}%</Text>
+                        <Text style={styles.analyticsText}>{inProgressPercentage}%</Text>
+                        <Text style={styles.analyticsText}>{notStartedPercentage}%</Text>
+                        <Text 
+                            style={[
+                                styles.productivity,
+                                {
+                                    color:
+                                        getProductivity() === 'High'
+                                            ? '#28a745'
+                                            : getProductivity() === 'Medium'
+                                            ? '#ffc107'
+                                            : '#dc3545'
+                                },
+                        ]}
+                        >
+                            {completedPercentage}%
+                        </Text>
+                    </View>
+                )}
+                <TouchableOpacity 
+                    style={styles.viewCalenderButton} 
+                    onPress={() => setViewCalendarVisibile(true)}
+                >
+                    <Text style={styles.viewCalendarButtonText}>View Calendar</Text>
+                </TouchableOpacity>
             </KeyboardAvoidingView>
+            <Modal visible={selectCalendarVisible} transparent animationType="slide">
+                <View style={styles.modalBackground}>
+                    <View style={styles.calendarContainer}>
+                        <Calendar 
+                            onLongPress={day => {
+                                setDueDate(day.dayString);
+                                setSelectCalendarVisibile(false);
+                            }}
+                            markedDates={
+                                dueDate
+                                    ? {
+                                        [dueDate] : {
+                                            selected: true,
+                                            selectedColor: '#007bff'
+                                        },
+                                    }   
+                                : {}
+                            }
+                        />
+                        <TouchableOpacity 
+                            onPress={() => setSelectCalendarVisibile(false)}
+                            style={styles.closeButton}
+                        >
+                            <Text style={styles.closeButtonText}>Close</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+            <Modal visible={viewCalendarVisible} transparent animationType="slide">
+                <View style={styles.modalBackground}>
+                    <View style={styles.calendarContainer}>
+                        <Calendar markedDates={markDeadLines} />
+                        <TouchableOpacity
+                            onPress={() => setViewCalendarVisibile(false)}
+                            style={styles.closeButton}
+                        >
+                            <Text style={styles.closeButtonText}>Close</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </>
     )
 }
+const styles = StyleSheet.create({
+    container: {flex: 1, padding: 16, backgroundColor: '#fff'},
+    header: {fontSize: 24, fontWeight: 'bold', marginBottom: 16},
+    input: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+        padding: 10,
+        marginBottom: 10,
+    },
+    statusContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 10,
+    },
+    statusButton: {
+        padding: 8,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 6,
+    },
+    statusSelected: {
+        backgroundColor: '#d0f0c0',
+    },
+    statusText: {fontSize: 12},
+    dueDateContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 12,
+    },
+    calendarButton: {
+        backgroundColor: '#007bff',
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+        borderRadius: 6,
+    },
+    calenderButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+    },
+    saveButton: {
+        backgroundColor: '#007bff',
+        padding: 10,
+        borderRadius: 6,
+        alignItems: 'center',
+        marginBottom: 60,
+    },
+    saveButtonText: {color: '#fff', fontWeight: 'bold'},
+    list: {marginTop: 16},
+    card: {
+        flex: 1,
+        backgroundColor: '#f9f9f9',
+        borderRadius: 10,
+        padding: 10,
+        margin: 5,
+        minWidth: '30%',
+        maxWidth: '30%'
+    },
+    cardTitle: {fontWeight: 'bold'},
+    cradDescription: {fontSize: 12, color: '#555'},
+    cradStatus: {fontSize: 12, color: '#007bff', marginVertical: 4},
+    cradDueDate: {fontSize: 12, color: '#888', marginBottom: 4},
+    cradButtons: {flexDirection: 'row', justifyContent: 'space-between'},
+    edit: {color: 'orange'},
+    delete: {color: 'red'},
+    ModalBackground: {
+        flex: 1,
+        backgroundColor: '#000000AA',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    calendarContainer: {
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        padding: 16,
+        width: '90%',
+        maxHeight: '70%',
+    },
+    closeButton: {
+        marginTop: 12,
+        backgroundColor: '#007bff',
+        borderRadius: 6,
+        padding: 10,
+        alignItems: 'center',
+    },
+    closeButtonText: {color: '#fff', fontWeight: 'bold'},
+    viewCalendarButton: {
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
+        backgroundColor: '#007bff',
+        paddingVertical: 12,
+        paddingHorizontal: 18,
+        borderRadius: 30,
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: {width: 0, height: 3},
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+    },
+    viewCalenderButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+    },
+})
