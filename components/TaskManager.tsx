@@ -1,14 +1,14 @@
-import React,{ useState } from "react";
+import React, { useState } from "react";
 import {
-    View,
+    FlatList,
+    KeyboardAvoidingView,
+    Modal,
+    Platform,
+    StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
-    StyleSheet,
-    FlatList,
-    KeyboardAvoidingView,
-    Platform,
-    Modal,
+    View,
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 
@@ -128,13 +128,13 @@ export default function TaskManager() {
                         Due Date: {dueDate? dueDate: 'none'}
                     </Text>
                     <TouchableOpacity
-                        onPress={setSelectCalendarVisibile(true)}
+                        onPress={() => setSelectCalendarVisibile(true)}
                         style={styles.calendarButton}
                     >
                         <Text style={styles.calendarButtonText}>Select Due Date</Text>
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={styles.saveButto} onPress={handleSave}>
+                <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
                     <Text style={styles.saveButtonText}>{editId? 'Update Task' : 'Add Task'}</Text>
                 </TouchableOpacity>
                 <FlatList 
@@ -143,7 +143,7 @@ export default function TaskManager() {
                     numColumns={3}
                     contentContainerStyle={styles.list}
                     renderItem={({ item }) => (
-                        <View style={styles..card}>
+                        <View style={styles.card}>
                             <Text style={styles.cardTitle}>{item.title}</Text>
                             <Text style={styles.cardDescription}>{item.description}</Text>
                             <Text style={styles.cardStatus}>{item.status}</Text>
@@ -185,7 +185,7 @@ export default function TaskManager() {
                     </View>
                 )}
                 <TouchableOpacity 
-                    style={styles.viewCalenderButton} 
+                    style={styles.viewCalendarButton} 
                     onPress={() => setViewCalendarVisibile(true)}
                 >
                     <Text style={styles.viewCalendarButtonText}>View Calendar</Text>
@@ -195,8 +195,8 @@ export default function TaskManager() {
                 <View style={styles.modalBackground}>
                     <View style={styles.calendarContainer}>
                         <Calendar 
-                            onLongPress={day => {
-                                setDueDate(day.dayString);
+                            onDayPress={day => {
+                                setDueDate(day.dateString);
                                 setSelectCalendarVisibile(false);
                             }}
                             markedDates={
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         borderRadius: 6,
     },
-    calenderButtonText: {
+    calendarButtonText: {
         color: '#fff',
         fontWeight: 'bold',
     },
@@ -294,13 +294,13 @@ const styles = StyleSheet.create({
         maxWidth: '30%'
     },
     cardTitle: {fontWeight: 'bold'},
-    cradDescription: {fontSize: 12, color: '#555'},
-    cradStatus: {fontSize: 12, color: '#007bff', marginVertical: 4},
-    cradDueDate: {fontSize: 12, color: '#888', marginBottom: 4},
-    cradButtons: {flexDirection: 'row', justifyContent: 'space-between'},
+    cardDescription: {fontSize: 12, color: '#555'},
+    cardStatus: {fontSize: 12, color: '#007bff', marginVertical: 4},
+    cardDueDate: {fontSize: 12, color: '#888', marginBottom: 4},
+    cardButton: {flexDirection: 'row', justifyContent: 'space-between'},
     edit: {color: 'orange'},
     delete: {color: 'red'},
-    ModalBackground: {
+    modalBackground: {
         flex: 1,
         backgroundColor: '#000000AA',
         justifyContent: 'center',
@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 5,
     },
-    viewCalenderButtonText: {
+    viewCalendarButtonText: {
         color: '#fff',
         fontWeight: 'bold',
     },
